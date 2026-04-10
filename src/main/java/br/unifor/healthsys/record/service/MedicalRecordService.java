@@ -20,6 +20,10 @@ public class MedicalRecordService {
         return recordRepository.save(record);
     }
 
+    public List<MedicalRecord> findAll() {
+        return recordRepository.findAll();
+    }
+
     public List<MedicalRecord> findByPatientId(Long patientId) {
         return recordRepository.findByPatientId(patientId);
     }
@@ -39,9 +43,17 @@ public class MedicalRecordService {
 
     public MedicalRecord update(String id, MedicalRecord updated) {
         MedicalRecord existing = findById(id);
+        existing.setPatientId(updated.getPatientId());
+        existing.setPatientName(updated.getPatientName());
         existing.setDiagnosis(updated.getDiagnosis());
         existing.setTreatment(updated.getTreatment());
         existing.setObservations(updated.getObservations());
+        existing.setResponsibleDoctorId(updated.getResponsibleDoctorId());
+        existing.setResponsibleDoctorName(updated.getResponsibleDoctorName());
         return recordRepository.save(existing);
+    }
+
+    public void delete(String id) {
+        recordRepository.delete(findById(id));
     }
 }

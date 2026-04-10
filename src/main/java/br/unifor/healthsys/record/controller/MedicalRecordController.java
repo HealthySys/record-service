@@ -18,6 +18,11 @@ public class MedicalRecordController {
         this.recordService = recordService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<MedicalRecord>> findAll() {
+        return ResponseEntity.ok(recordService.findAll());
+    }
+
     @PostMapping
     public ResponseEntity<MedicalRecord> create(@RequestBody MedicalRecord record) {
         return ResponseEntity.status(HttpStatus.CREATED).body(recordService.create(record));
@@ -43,5 +48,11 @@ public class MedicalRecordController {
     public ResponseEntity<MedicalRecord> update(@PathVariable String id,
                                                  @RequestBody MedicalRecord record) {
         return ResponseEntity.ok(recordService.update(id, record));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        recordService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
