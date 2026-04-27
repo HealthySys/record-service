@@ -57,5 +57,6 @@ public class MedicalRecord {
         private String doctorName;
         private LocalDateTime entryDate;
         private String origin;      // MANUAL, KAFKA_TRIAGE, KAFKA_EXAME
+        private String correlationId;
     }
 }
