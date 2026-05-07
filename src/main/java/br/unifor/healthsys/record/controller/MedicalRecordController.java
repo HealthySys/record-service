@@ -1,5 +1,6 @@
 package br.unifor.healthsys.record.controller;
 
+import br.unifor.healthsys.record.dto.AtendimentoPayload;
 import br.unifor.healthsys.record.model.MedicalRecord;
 import br.unifor.healthsys.record.security.AuthenticatedUser;
 import br.unifor.healthsys.record.service.MedicalRecordService;
@@ -10,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/records")
@@ -63,8 +65,45 @@ public class MedicalRecordController {
     @PostMapping("/{id}/entries")
     @PreAuthorize("hasAnyRole('MEDICO','ADMIN')")
     public ResponseEntity<MedicalRecord> addEntry(@PathVariable String id,
-                                                   @RequestBody MedicalRecord.RecordEntry entry) {
-        return ResponseEntity.ok(recordService.addEntry(id, entry));
+                                                   @RequestBody MedicalRecord.RecordEntry entry,
+                                                   @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return ResponseEntity.ok(recordService.addEntry(id, entry, authenticatedUser));
+    }
+
+    @PostMapping("/{id}/prescriptions")
+    @PreAuthorize("hasAnyRole('MEDICO','ADMIN')")
+    public ResponseEntity<MedicalRecord> addPrescription(@PathVariable String id,
+                                                          @RequestBody MedicalRecord.Prescription prescription,
+                                                          @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return ResponseEntity.ok(recordService.addPrescription(id, prescription, authenticatedUser));
+    }
+
+    @PostMapping("/{id}/exams")
+    @PreAuthorize("hasAnyRole('MEDICO','ADMIN')")
+    public ResponseEntity<MedicalRecord> addExam(@PathVariable String id,
+                                                  @RequestBody MedicalRecord.Exam exam,
+                                                  @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return ResponseEntity.ok(recordService.addExam(id, exam, authenticatedUser));
+    }
+
+    @PostMapping("/{id}/atendimentos")
+    @PreAuthorize("hasAnyRole('MEDICO','ADMIN')")
+    public ResponseEntity<MedicalRecord> registerAtendimento(@PathVariable String id,
+                                                              @RequestBody AtendimentoPayload payload,
+                                                              @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        return ResponseEntity.ok(recordService.registerAtendimento(id, payload, authenticatedUser));
+    }
+
+    @PatchMapping("/{id}/exams/{examId}/result")
+    @PreAuthorize("hasAnyRole('MEDICO','ADMIN')")
+    public ResponseEntity<MedicalRecord> updateExamResult(@PathVariable String id,
+                                                           @PathVariable String examId,
+                                                           @RequestBody Map<String, Object> body) {
+        String resultado = String.valueOf(body.getOrDefault("resultado", ""));
+        MedicalRecord.StatusExame status = body.get("status") != null
+                ? MedicalRecord.StatusExame.valueOf(String.valueOf(body.get("status")))
+                : MedicalRecord.StatusExame.CONCLUIDO;
+        return ResponseEntity.ok(recordService.updateExamResult(id, examId, resultado, status));
     }
 
     @PutMapping("/{id}")

@@ -28,6 +28,12 @@ public class TriageEventConsumer {
 
     @KafkaListener(topics = "triagem-events", groupId = "record-service-group")
     public void consumeTriageEvent(JsonNode event) {
+        String type = event.path("type").asText("TRIAGEM_CLASSIFICADA");
+        if (!"TRIAGEM_CLASSIFICADA".equals(type)) {
+            log.debug("Evento ignorado pelo prontuario. type={}", type);
+            return;
+        }
+
         String correlationId = event.path("correlationId").asText("");
         if (!correlationId.isBlank() && processedEventRepository.existsByCorrelationId(correlationId)) {
             log.warn("Evento duplicado descartado no prontuario. correlationId={}", correlationId);
