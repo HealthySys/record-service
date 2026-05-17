@@ -41,5 +41,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/healthysys-record-service:latest
-            ghcr.io/${{ github.repository_owner }}/healthysys-record-service:${{ github.sha }}
+            ghcr.io/healthysys/healthysys-record-service:latest
+            ghcr.io/healthysys/healthysys-record-service:${{ github.sha }}
