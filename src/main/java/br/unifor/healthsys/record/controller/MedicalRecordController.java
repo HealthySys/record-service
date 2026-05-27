@@ -24,15 +24,8 @@ public class MedicalRecordController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('MEDICO','ENFERMEIRO','ADMIN','PACIENTE')")
-    public ResponseEntity<List<MedicalRecord>> findAll(@RequestParam(required = false) Long patientId,
-                                                       @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (authenticatedUser != null && "PACIENTE".equalsIgnoreCase(authenticatedUser.role()) && patientId == null) {
-            throw new IllegalArgumentException("Paciente deve consultar o prontuario com patientId informado.");
-        }
-        if (authenticatedUser != null && "PACIENTE".equalsIgnoreCase(authenticatedUser.role())) {
-            return ResponseEntity.ok(recordService.findAuthorizedByPatientId(patientId, authenticatedUser));
-        }
+    @PreAuthorize("hasAnyRole('MEDICO','ENFERMEIRO','ADMIN')")
+    public ResponseEntity<List<MedicalRecord>> findAll(@RequestParam(required = false) Long patientId) {
         return ResponseEntity.ok(recordService.findAll(patientId));
     }
 
@@ -43,22 +36,14 @@ public class MedicalRecordController {
     }
 
     @GetMapping("/patient/{patientId}")
-    @PreAuthorize("hasAnyRole('MEDICO','ENFERMEIRO','ADMIN','PACIENTE')")
-    public ResponseEntity<List<MedicalRecord>> findByPatientId(@PathVariable Long patientId,
-                                                               @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (authenticatedUser != null && "PACIENTE".equalsIgnoreCase(authenticatedUser.role())) {
-            return ResponseEntity.ok(recordService.findAuthorizedByPatientId(patientId, authenticatedUser));
-        }
+    @PreAuthorize("hasAnyRole('MEDICO','ENFERMEIRO','ADMIN')")
+    public ResponseEntity<List<MedicalRecord>> findByPatientId(@PathVariable Long patientId) {
         return ResponseEntity.ok(recordService.findByPatientId(patientId));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MEDICO','ENFERMEIRO','ADMIN','PACIENTE')")
-    public ResponseEntity<MedicalRecord> findById(@PathVariable String id,
-                                                  @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        if (authenticatedUser != null && "PACIENTE".equalsIgnoreCase(authenticatedUser.role())) {
-            return ResponseEntity.ok(recordService.findAuthorizedById(id, authenticatedUser));
-        }
+    @PreAuthorize("hasAnyRole('MEDICO','ENFERMEIRO','ADMIN')")
+    public ResponseEntity<MedicalRecord> findById(@PathVariable String id) {
         return ResponseEntity.ok(recordService.findById(id));
     }
 
