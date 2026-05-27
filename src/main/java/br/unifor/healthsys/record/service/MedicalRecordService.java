@@ -117,6 +117,21 @@ public class MedicalRecordService {
         String doctorId = String.valueOf(authenticatedUser.userId());
         String doctorName = authenticatedUser.nome();
 
+        AtendimentoPayload.ConsultationInput consultation = payload.consultation();
+        if (consultation != null) {
+            if (consultation.diagnosis() != null && !consultation.diagnosis().isBlank()) {
+                record.setDiagnosis(consultation.diagnosis().trim());
+            }
+            if (consultation.treatment() != null && !consultation.treatment().isBlank()) {
+                record.setTreatment(consultation.treatment().trim());
+            }
+            if (consultation.observations() != null && !consultation.observations().isBlank()) {
+                record.setObservations(consultation.observations().trim());
+            }
+        }
+        record.setResponsibleDoctorId(doctorId);
+        record.setResponsibleDoctorName(doctorName);
+
         if (!description.isEmpty()) {
             MedicalRecord.RecordEntry entry = MedicalRecord.RecordEntry.builder()
                     .type("CONSULTA")
@@ -245,10 +260,6 @@ public class MedicalRecordService {
         existing.setResponsibleDoctorId(updated.getResponsibleDoctorId());
         existing.setResponsibleDoctorName(updated.getResponsibleDoctorName());
         return recordRepository.save(existing);
-    }
-
-    public void delete(String id) {
-        recordRepository.delete(findById(id));
     }
 
     private void ensureOwnRecordAccess(Long patientId, AuthenticatedUser authenticatedUser) {
