@@ -113,10 +113,4 @@ public class MedicalRecordController {
         return ResponseEntity.ok(recordService.update(id, record));
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        recordService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }
