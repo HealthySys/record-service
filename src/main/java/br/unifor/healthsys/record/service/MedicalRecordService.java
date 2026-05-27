@@ -5,7 +5,6 @@ import br.unifor.healthsys.record.dto.AtendimentoPayload;
 import br.unifor.healthsys.record.model.MedicalRecord;
 import br.unifor.healthsys.record.security.AuthenticatedUser;
 import br.unifor.healthsys.record.repository.MedicalRecordRepository;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -48,20 +47,9 @@ public class MedicalRecordService {
         return recordRepository.findByPatientId(patientId);
     }
 
-    public List<MedicalRecord> findAuthorizedByPatientId(Long patientId, AuthenticatedUser authenticatedUser) {
-        ensureOwnRecordAccess(patientId, authenticatedUser);
-        return recordRepository.findByPatientId(patientId);
-    }
-
     public MedicalRecord findById(String id) {
         return recordRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Prontuario nao encontrado: " + id));
-    }
-
-    public MedicalRecord findAuthorizedById(String id, AuthenticatedUser authenticatedUser) {
-        MedicalRecord record = findById(id);
-        ensureOwnRecordAccess(record.getPatientId(), authenticatedUser);
-        return record;
     }
 
     public MedicalRecord addEntry(String recordId, MedicalRecord.RecordEntry entry, AuthenticatedUser authenticatedUser) {
@@ -262,18 +250,4 @@ public class MedicalRecordService {
         return recordRepository.save(existing);
     }
 
-    private void ensureOwnRecordAccess(Long patientId, AuthenticatedUser authenticatedUser) {
-        if (patientId == null) {
-            throw new AccessDeniedException("Prontuario sem paciente vinculado nao pode ser consultado pelo paciente.");
-        }
-        if (authenticatedUser == null || authenticatedUser.email() == null || authenticatedUser.email().isBlank()) {
-            throw new AccessDeniedException("Sessao sem e-mail valido para validar acesso ao prontuario.");
-        }
-
-        InternalPatientClient.InternalPatientSummaryResponse patient =
-                internalPatientClient.fetchRequiredPatient(patientId);
-        if (patient.email() == null || !patient.email().equalsIgnoreCase(authenticatedUser.email())) {
-            throw new AccessDeniedException("Paciente pode visualizar apenas o proprio prontuario.");
-        }
-    }
 }
